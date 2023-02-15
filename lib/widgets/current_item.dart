@@ -30,7 +30,6 @@ class CurrentItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<FileManagement>(builder: (_) {
-      print("${fileManagement.readFileSize}     ${fileManagement.totalFileSize}     ${fileManagement.readFileSize / fileManagement.totalFileSize}");
       return CustomCard(
         height: null,
         child: fileManagement.isRunning

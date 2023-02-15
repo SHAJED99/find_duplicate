@@ -1,16 +1,6 @@
 import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
-import 'dart:io';
-import 'dart:convert';
-import 'package:path_provider/path_provider.dart';
-import 'package:crypto/crypto.dart';
-
 import 'package:crypto/crypto.dart';
 import 'package:find_duplicate/services/file_management.dart';
-import 'dart:convert';
-import 'package:convert/convert.dart';
-import 'package:crypto/crypto.dart';
 
 Future<void> findDuplicateIsolated(InputModel inputModel) async {
   inputModel.sendPort.send(OutputModel(isRunning: true));
@@ -49,7 +39,7 @@ Future<void> findDuplicateIsolated(InputModel inputModel) async {
     }
     itemCount = itemCount + 1;
   }
-  inputModel.sendPort.send(OutputModel(isRunning: false));
+  inputModel.sendPort.send(OutputModel(isRunning: false, itemCount: itemCount));
 }
 
 Future<String> calculateSha256(String filePath) async {

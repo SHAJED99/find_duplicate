@@ -1,18 +1,11 @@
 import 'dart:io';
 import 'package:find_duplicate/services/isolated_work.dart';
 import 'package:get/get.dart';
-import 'package:crypto/crypto.dart';
 import 'dart:isolate';
-import 'package:easy_folder_picker/DirectoryList.dart';
-import 'package:easy_folder_picker/FolderPicker.dart';
 import 'package:tuple/tuple.dart';
 
 class FileManagement extends GetxController {
-  // String path = "D:/New Folder";
-  // String path = "D:/New Folder 1/";
-  // String path = "D:/New Folder 2/";
-  String path = "D:/Onlune Class";
-  // String path = "D:/";
+  String? path;
   List<String> pathList = [];
   List<String> pathItems = [];
 
@@ -23,20 +16,23 @@ class FileManagement extends GetxController {
   int itemCount = 0;
   int totalFileSize = 0;
   int readFileSize = 0;
+  // Creating Isolated Service
+  ReceivePort _receivePort = ReceivePort();
 
   // Getting all files in those path
   Future<void> findDuplicate() async {
+    hashMap = {};
+    _receivePort = ReceivePort();
+    if (path == null) return;
     // Get All folders and subfolder and Items
-    final temp = await traverseDirectory(directory: Directory(path));
+    final temp = await traverseDirectory(directory: Directory(path ?? ""));
     pathList = temp.item1;
     pathItems = temp.item2;
 
-    // Creating Isolated Service
-    ReceivePort receivePort = ReceivePort();
-    await Isolate.spawn<InputModel>(findDuplicateIsolated, InputModel(sendPort: receivePort.sendPort, pathItems: pathItems));
+    await Isolate.spawn<InputModel>(findDuplicateIsolated, InputModel(sendPort: _receivePort.sendPort, pathItems: pathItems));
 
     // Update current status of the isolate thread
-    receivePort.listen(<OutputModel>(outputModel) {
+    _receivePort.listen(<OutputModel>(outputModel) {
       hashMap = outputModel.hashMap ?? hashMap;
       currentFile = outputModel.currentFile ?? currentFile;
       isRunning = outputModel.isRunning ?? isRunning;
@@ -45,6 +41,23 @@ class FileManagement extends GetxController {
       readFileSize = outputModel.readFileSize ?? readFileSize;
       update();
     });
+  }
+
+  void initVariables() {
+    try {
+      _receivePort.close();
+      path = null;
+      pathList = [];
+      pathItems = [];
+      currentFile = null;
+      isRunning = false;
+      itemCount = 0;
+      totalFileSize = 0;
+      readFileSize = 0;
+      update();
+    } catch (e) {
+      print(e);
+    }
   }
 }
 
