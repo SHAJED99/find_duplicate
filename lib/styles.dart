@@ -9,7 +9,7 @@ const double defaultMargin = defaultPadding / 4;
 
 // Container
 const double defaultBoxHeight = 50;
-const double defaultBorderRadious = defaultMargin;
+const double defaultBorderRadius = defaultMargin;
 
 // Shadow
 const List<BoxShadow> defaultShadow = [

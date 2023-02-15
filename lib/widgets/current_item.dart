@@ -11,7 +11,7 @@ class CurrentItem extends StatelessWidget {
     this.defaultDuration = 150,
     this.height = defaultBoxHeight,
     this.boxShadow = defaultShadow,
-    this.borderRadius = const BorderRadius.all(Radius.circular(defaultBorderRadious)),
+    this.borderRadius = const BorderRadius.all(Radius.circular(defaultBorderRadius)),
     this.alignment = Alignment.center,
     this.margin = const EdgeInsets.all(defaultMargin),
     this.backgroundColor = Colors.white,
@@ -30,37 +30,55 @@ class CurrentItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<FileManagement>(builder: (_) {
+      print("${fileManagement.readFileSize}     ${fileManagement.totalFileSize}     ${fileManagement.readFileSize / fileManagement.totalFileSize}");
       return CustomCard(
         height: null,
-        // child: fileManagement.isRunning
-        //     ? Padding(
-        //         padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: defaultPadding / 2),
-        //         child: Row(
-        //           children: [
-        //             Expanded(child: Text(fileManagement.currentFile != null ? fileManagement.currentFile!.split('/').last : "")),
-        //             const SizedBox(width: defaultPadding / 2),
-        //             Column(
-        //               children: [
-        //                 const SizedBox(
-        //                   height: defaultPadding,
-        //                   width: defaultPadding,
-        //                   child: AspectRatio(
-        //                     aspectRatio: 1,
-        //                     child: CircularProgressIndicator(strokeWidth: defaultPadding / 6),
-        //                   ),
-        //                 ),
-        //                 const SizedBox(height: defaultPadding / 2),
-        //                 Text(
-        //                   fileManagement.itemCount.toString(),
-        //                   textAlign: TextAlign.center,
-        //                   style: const TextStyle(fontSize: 12),
-        //                 ),
-        //               ],
-        //             ),
-        //           ],
-        //         ),
-        //       )
-        //     : null,
+        child: fileManagement.isRunning
+            ? Stack(
+                children: [
+                  if (fileManagement.totalFileSize != 0)
+                    Positioned.fill(
+                        child: LinearProgressIndicator(
+                      value: fileManagement.readFileSize / fileManagement.totalFileSize,
+                    )),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: defaultPadding / 2),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          fileManagement.currentFile != null ? fileManagement.currentFile!.split('/').last : "",
+                          style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).canvasColor),
+                        )),
+                        const SizedBox(width: defaultPadding / 2),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              height: defaultPadding,
+                              width: defaultPadding,
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: defaultPadding / 6,
+                                  color: Theme.of(context).canvasColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: defaultPadding / 2),
+                            Text(
+                              "${fileManagement.itemCount}/${fileManagement.pathItems.length}",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 12, color: Theme.of(context).canvasColor, height: 1),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            : null,
       );
     });
   }

@@ -10,7 +10,7 @@ class CustomElevatedButton extends StatefulWidget {
     this.margin = const EdgeInsets.all(defaultMargin),
     this.color,
     this.boxShadow = defaultShadow,
-    this.borderRadius = const BorderRadius.all(Radius.circular(defaultBorderRadious)),
+    this.borderRadius = const BorderRadius.all(Radius.circular(defaultBorderRadius)),
     this.child,
     this.onLoading = const AspectRatio(aspectRatio: 1, child: CircularProgressIndicator(color: Colors.white)),
     this.onSuccess = const FittedBox(child: FaIcon(FontAwesomeIcons.check, color: Colors.greenAccent)),
@@ -18,11 +18,12 @@ class CustomElevatedButton extends StatefulWidget {
     this.onTap,
     this.defaultDuration = 3000,
     this.height = defaultBoxHeight,
+    this.colorValue = 1,
   });
   final AlignmentGeometry? alignment;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
-  final Color? color;
+  final MaterialColor? color;
   final List<BoxShadow>? boxShadow;
   final BorderRadiusGeometry? borderRadius;
   final Widget? child;
@@ -32,6 +33,7 @@ class CustomElevatedButton extends StatefulWidget {
   final Function()? onTap;
   final int defaultDuration;
   final double? height;
+  final double colorValue;
 
   @override
   State<CustomElevatedButton> createState() => _CustomElevatedButtonState();
@@ -56,36 +58,47 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
         borderRadius: widget.borderRadius,
         boxShadow: widget.boxShadow,
       ),
-      child: Material(
-        color: widget.color ?? Theme.of(context).primaryColor,
-        child: InkWell(
-          onTap: () async {
-            if (loadingButtonState != LoadingButtonState.stable) return;
-            if (widget.onTap == null) return;
-            setState(() => loadingButtonState = LoadingButtonState.loading);
-            bool? res = await widget.onTap!();
-            // res has value
-            if (res == null) {
-              setState(() => loadingButtonState = LoadingButtonState.stable);
-              return;
-            } else {
-              if (res && widget.onLoading != null) {
-                setState(() => loadingButtonState = LoadingButtonState.success);
-                await Future.delayed(Duration(milliseconds: widget.defaultDuration));
-              } else if (!res && widget.onError != null) {
-                setState(() => loadingButtonState = LoadingButtonState.error);
-                await Future.delayed(Duration(milliseconds: widget.defaultDuration));
-              }
-            }
-            setState(() => loadingButtonState = LoadingButtonState.stable);
-          },
-          child: Container(
-            height: widget.height,
-            alignment: widget.alignment,
-            padding: widget.padding,
-            child: childHolder(),
+      child: Stack(
+        children: [
+          Positioned.fill(
+              child: Theme(
+            data: ThemeData(primarySwatch: widget.color ?? Theme.of(context).primaryColor as MaterialColor),
+            child: LinearProgressIndicator(
+              value: widget.colorValue,
+            ),
+          )),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () async {
+                if (loadingButtonState != LoadingButtonState.stable) return;
+                if (widget.onTap == null) return;
+                setState(() => loadingButtonState = LoadingButtonState.loading);
+                bool? res = await widget.onTap!();
+                // res has value
+                if (res == null) {
+                  setState(() => loadingButtonState = LoadingButtonState.stable);
+                  return;
+                } else {
+                  if (res && widget.onLoading != null) {
+                    setState(() => loadingButtonState = LoadingButtonState.success);
+                    await Future.delayed(Duration(milliseconds: widget.defaultDuration));
+                  } else if (!res && widget.onError != null) {
+                    setState(() => loadingButtonState = LoadingButtonState.error);
+                    await Future.delayed(Duration(milliseconds: widget.defaultDuration));
+                  }
+                }
+                setState(() => loadingButtonState = LoadingButtonState.stable);
+              },
+              child: Container(
+                height: widget.height,
+                alignment: widget.alignment,
+                padding: widget.padding,
+                child: childHolder(),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

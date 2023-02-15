@@ -7,7 +7,7 @@ class CustomCard extends StatelessWidget {
     this.margin = const EdgeInsets.all(defaultMargin),
     this.alignment = Alignment.center,
     this.backgroundColor = Colors.white,
-    this.borderRadius = const BorderRadius.all(Radius.circular(defaultBorderRadious)),
+    this.borderRadius = const BorderRadius.all(Radius.circular(defaultBorderRadius)),
     this.boxShadow = defaultShadow,
     this.child,
     this.height = defaultBoxHeight,
@@ -23,6 +23,7 @@ class CustomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      clipBehavior: Clip.antiAlias,
       margin: margin,
       height: height,
       alignment: alignment,

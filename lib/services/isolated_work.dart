@@ -1,52 +1,66 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:io';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
+import 'package:crypto/crypto.dart';
 
 import 'package:crypto/crypto.dart';
 import 'package:find_duplicate/services/file_management.dart';
+import 'dart:convert';
+import 'package:convert/convert.dart';
+import 'package:crypto/crypto.dart';
 
 Future<void> findDuplicateIsolated(InputModel inputModel) async {
+  inputModel.sendPort.send(OutputModel(isRunning: true));
   Map<String, List<String>> hashMap = {};
   int itemCount = 0;
 
   for (String fileItem in inputModel.pathItems) {
-    // print(fileItem);
-    inputModel.sendPort.send(OutputModel(
-      isRunning: true,
-      currentFile: fileItem,
-      hashMap: hashMap,
-      itemCount: itemCount,
-    ));
-
     try {
-      // Open file stream
+      // Opening file
       final file = File(fileItem);
+      final int totalFileSize = await file.length();
+      int readFileSize = 0;
+      // Sending current status to the main
+      inputModel.sendPort.send(OutputModel(currentFile: fileItem, totalFileSize: totalFileSize, readFileSize: readFileSize, itemCount: itemCount));
+
       final inputStream = file.openRead();
-      final List<List<int>> list = await inputStream.toList();
+      final List<int> chunkElement = [];
+      await inputStream.forEach((element) {
+        chunkElement.addAll(sha256.convert(chunkElement).bytes);
+        readFileSize = readFileSize + element.length;
+        // Sending current status to the main
+        inputModel.sendPort.send(OutputModel(readFileSize: readFileSize));
+      });
 
-      String digest = "";
+      final digest = sha256.convert(chunkElement).toString();
 
-      // print(list.length);
-      final List<int> content = list.expand((i) {
-        print(i.length);
-        digest = digest + i.toString();
-        return i;
-      }).toList();
-      print(content.length);
-      print(digest.length);
+      if (hashMap[digest] == null) {
+        hashMap[digest] = [fileItem];
+      } else {
+        hashMap[digest]!.add(fileItem);
+      }
 
-      // Converting Unique ID
-      // final digest = sha256.convert(content).toString();
-
-      // Checking if item is unique
-      //   if (hashMap[digest] == null) {
-      //     hashMap[digest] = [fileItem];
-      //   } else {
-      //     hashMap[digest]!.add(fileItem);
-      //   }
+      inputModel.sendPort.send(OutputModel(hashMap: hashMap));
     } catch (e) {
       print(e);
     }
+    itemCount = itemCount + 1;
   }
-  print("Done");
+  inputModel.sendPort.send(OutputModel(isRunning: false));
+}
+
+Future<String> calculateSha256(String filePath) async {
+  final file = File(filePath);
+  int fileSize = await file.length();
+  print(fileSize);
+  final input = file.openRead();
+
+  await input.forEach((chunk) {
+    print("${chunk.length}  ${sha256.convert(chunk).bytes.length}");
+  });
+
+  return "hash.toString()";
 }
