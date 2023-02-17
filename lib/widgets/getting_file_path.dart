@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:find_duplicate/services/file_management.dart';
 import 'package:find_duplicate/styles.dart';
@@ -13,6 +12,16 @@ class SelectSystemPath extends StatelessWidget {
 
   Future<void> _pickDirectory(BuildContext context) async {
     fileManagement.path = await FilePicker.platform.getDirectoryPath();
+  }
+
+  String status() {
+    if (fileManagement.isRunning) {
+      return "Scanning${fileManagement.duplicateFiles.isEmpty ? "" : " ${fileManagement.duplicateFiles.length}"}";
+    } else if (fileManagement.duplicateFiles.isNotEmpty) {
+      return "${fileManagement.duplicateFiles.length} duplicate files";
+    } else {
+      return "Select Path";
+    }
   }
 
   @override
@@ -32,7 +41,7 @@ class SelectSystemPath extends StatelessWidget {
           await _pickDirectory(context);
           if (fileManagement.path != null) await fileManagement.findDuplicate();
         },
-        child: Text(fileManagement.path == null ? "Select Path" : "Scanning", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: defaultPadding, color: Colors.white)),
+        child: Text(status(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: defaultPadding, color: Colors.white)),
       );
     });
   }

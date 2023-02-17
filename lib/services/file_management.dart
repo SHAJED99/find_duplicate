@@ -6,22 +6,26 @@ import 'package:tuple/tuple.dart';
 
 class FileManagement extends GetxController {
   String? path;
-  List<String> pathList = [];
-  List<String> pathItems = [];
+  late List<String> pathList;
+  late List<String> pathItems;
 
   // Status variables
-  Map<String, List<String>> hashMap = {};
+  late Map<String, List<String>> duplicateFiles;
   String? currentFile;
-  bool isRunning = false;
-  int itemCount = 0;
-  int totalFileSize = 0;
-  int readFileSize = 0;
+  late bool isRunning;
+  late int itemCount;
+  late int totalFileSize;
+  late int readFileSize;
+  late List<String> ignoreFiles = [];
   // Creating Isolated Service
   ReceivePort _receivePort = ReceivePort();
 
+  FileManagement() {
+    initVariables();
+  }
+
   // Getting all files in those path
   Future<void> findDuplicate() async {
-    hashMap = {};
     _receivePort = ReceivePort();
     if (path == null) return;
     // Get All folders and subfolder and Items
@@ -33,7 +37,7 @@ class FileManagement extends GetxController {
 
     // Update current status of the isolate thread
     _receivePort.listen(<OutputModel>(outputModel) {
-      hashMap = outputModel.hashMap ?? hashMap;
+      duplicateFiles = outputModel.duplicateFiles ?? duplicateFiles;
       currentFile = outputModel.currentFile ?? currentFile;
       isRunning = outputModel.isRunning ?? isRunning;
       itemCount = outputModel.itemCount ?? itemCount;
@@ -45,15 +49,18 @@ class FileManagement extends GetxController {
 
   void initVariables() {
     try {
-      _receivePort.close();
+      // _receivePort;
       path = null;
       pathList = [];
       pathItems = [];
+
+      duplicateFiles = {};
       currentFile = null;
       isRunning = false;
       itemCount = 0;
       totalFileSize = 0;
       readFileSize = 0;
+      ignoreFiles = [];
       update();
     } catch (e) {
       print(e);
@@ -69,14 +76,15 @@ class InputModel {
 }
 
 class OutputModel {
-  final Map<String, List<String>>? hashMap;
+  final Map<String, List<String>>? duplicateFiles;
   String? currentFile;
   final bool? isRunning;
   final int? itemCount;
   final int? totalFileSize;
   final int? readFileSize;
+  final List<String>? ignoreFiles;
 
-  OutputModel({this.hashMap, this.isRunning, this.itemCount, this.currentFile, this.totalFileSize, this.readFileSize});
+  OutputModel({this.ignoreFiles, this.duplicateFiles, this.isRunning, this.itemCount, this.currentFile, this.totalFileSize, this.readFileSize});
 }
 
 // Get All folders and subfolder and Items

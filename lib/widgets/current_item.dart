@@ -46,7 +46,7 @@ class CurrentItem extends StatelessWidget {
                       children: [
                         Expanded(
                             child: Text(
-                          fileManagement.currentFile != null ? fileManagement.currentFile!.split('/').last : "",
+                          fileManagement.currentFile != null ? fileManagement.currentFile!.split(fileManagement.path ?? "").last : "",
                           style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).canvasColor),
                         )),
                         const SizedBox(width: defaultPadding / 2),
@@ -82,28 +82,3 @@ class CurrentItem extends StatelessWidget {
     });
   }
 }
-
-
-// child: CustomCard(
-//           height: null,
-//           child: fileManagement.isRunning
-//               ? Padding(
-//                   padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       Text(fileManagement.currentFile != null ? fileManagement.currentFile!.split('/').last : ""),
-//                       const SizedBox(width: defaultPadding / 2),
-//                       if (fileManagement.isRunning)
-//                         const Padding(
-//                           padding: EdgeInsets.symmetric(vertical: defaultPadding / 1.5),
-//                           child: AspectRatio(
-//                             aspectRatio: 1,
-//                             child: CircularProgressIndicator(),
-//                           ),
-//                         ),
-//                     ],
-//                   ),
-//                 )
-//               : Container(),
-//         ),

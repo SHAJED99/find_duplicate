@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:find_duplicate/services/file_management.dart';
 
 Future<void> findDuplicateIsolated(InputModel inputModel) async {
-  inputModel.sendPort.send(OutputModel(isRunning: true));
+  inputModel.sendPort.send(OutputModel(isRunning: true, duplicateFiles: {}));
   Map<String, List<String>> hashMap = {};
+  Map<String, List<String>> duplicateFiles = {};
   int itemCount = 0;
 
   for (String fileItem in inputModel.pathItems) {
@@ -16,41 +19,35 @@ Future<void> findDuplicateIsolated(InputModel inputModel) async {
       // Sending current status to the main
       inputModel.sendPort.send(OutputModel(currentFile: fileItem, totalFileSize: totalFileSize, readFileSize: readFileSize, itemCount: itemCount));
 
-      final inputStream = file.openRead();
-      final List<int> chunkElement = [];
-      await inputStream.forEach((element) {
-        chunkElement.addAll(sha256.convert(chunkElement).bytes);
+      String sha256Hash = "";
+
+      // Opening file steam
+      var inputSteam = file.openRead();
+
+      await inputSteam.forEach((element) {
+        sha256Hash = sha256Hash + sha256.convert(element).toString();
+        sha256Hash = sha256.convert(utf8.encode(sha256Hash)).toString();
         readFileSize = readFileSize + element.length;
-        // Sending current status to the main
         inputModel.sendPort.send(OutputModel(readFileSize: readFileSize));
       });
+      print(sha256Hash.length);
 
-      final digest = sha256.convert(chunkElement).toString();
+      final digest = sha256.convert(utf8.encode(sha256Hash)).toString();
+
+      print("$totalFileSize $fileItem $digest");
 
       if (hashMap[digest] == null) {
         hashMap[digest] = [fileItem];
       } else {
         hashMap[digest]!.add(fileItem);
+        duplicateFiles[digest] = hashMap[digest]!;
       }
 
-      inputModel.sendPort.send(OutputModel(hashMap: hashMap));
+      inputModel.sendPort.send(OutputModel(duplicateFiles: duplicateFiles));
     } catch (e) {
       print(e);
     }
     itemCount = itemCount + 1;
   }
   inputModel.sendPort.send(OutputModel(isRunning: false, itemCount: itemCount));
-}
-
-Future<String> calculateSha256(String filePath) async {
-  final file = File(filePath);
-  int fileSize = await file.length();
-  print(fileSize);
-  final input = file.openRead();
-
-  await input.forEach((chunk) {
-    print("${chunk.length}  ${sha256.convert(chunk).bytes.length}");
-  });
-
-  return "hash.toString()";
 }

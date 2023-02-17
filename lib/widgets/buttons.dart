@@ -12,7 +12,7 @@ class CustomElevatedButton extends StatefulWidget {
     this.boxShadow = defaultShadow,
     this.borderRadius = const BorderRadius.all(Radius.circular(defaultBorderRadius)),
     this.child,
-    this.onLoading = const AspectRatio(aspectRatio: 1, child: CircularProgressIndicator(color: Colors.white)),
+    this.onLoading = const SizedBox(height: defaultBoxHeight - defaultPadding * 1.5, child: AspectRatio(aspectRatio: 1, child: CircularProgressIndicator(color: Colors.white))),
     this.onSuccess = const FittedBox(child: FaIcon(FontAwesomeIcons.check, color: Colors.greenAccent)),
     this.onError = const FittedBox(child: FaIcon(FontAwesomeIcons.exclamation, color: Colors.redAccent)),
     this.onTap,
