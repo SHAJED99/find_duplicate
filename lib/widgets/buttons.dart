@@ -61,11 +61,8 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
       child: Stack(
         children: [
           Positioned.fill(
-              child: Theme(
-            data: ThemeData(primarySwatch: widget.color ?? Theme.of(context).primaryColor as MaterialColor),
-            child: LinearProgressIndicator(
-              value: widget.colorValue,
-            ),
+              child: LinearProgressIndicator(
+            value: widget.colorValue,
           )),
           Material(
             color: Colors.transparent,
