@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:find_duplicate/services/dev_print.dart';
 import 'package:find_duplicate/services/isolated_work.dart';
 import 'package:get/get.dart';
 import 'dart:isolate';
@@ -33,6 +34,8 @@ class FileManagement extends GetxController {
     pathList = temp.item1;
     pathItems = temp.item2;
 
+    devPrint(path);
+
     await Isolate.spawn<InputModel>(findDuplicateIsolated, InputModel(sendPort: _receivePort.sendPort, pathItems: pathItems));
 
     // Update current status of the isolate thread
@@ -63,7 +66,7 @@ class FileManagement extends GetxController {
       ignoreFiles = [];
       update();
     } catch (e) {
-      print(e);
+      devPrint(e);
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:find_duplicate/services/dev_print.dart';
 import 'package:find_duplicate/services/file_management.dart';
 
 Future<void> findDuplicateIsolated(InputModel inputModel) async {
@@ -29,12 +29,13 @@ Future<void> findDuplicateIsolated(InputModel inputModel) async {
         sha256Hash = sha256.convert(utf8.encode(sha256Hash)).toString();
         readFileSize = readFileSize + element.length;
         inputModel.sendPort.send(OutputModel(readFileSize: readFileSize));
+        devPrint(readFileSize);
       });
-      print(sha256Hash.length);
+      devPrint(sha256Hash.length);
 
       final digest = sha256.convert(utf8.encode(sha256Hash)).toString();
 
-      print("$totalFileSize $fileItem $digest");
+      devPrint("$totalFileSize $fileItem $digest");
 
       if (hashMap[digest] == null) {
         hashMap[digest] = [fileItem];
@@ -45,7 +46,7 @@ Future<void> findDuplicateIsolated(InputModel inputModel) async {
 
       inputModel.sendPort.send(OutputModel(duplicateFiles: duplicateFiles));
     } catch (e) {
-      print(e);
+      devPrint(e);
     }
     itemCount = itemCount + 1;
   }

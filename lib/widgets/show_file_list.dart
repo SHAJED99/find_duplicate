@@ -10,23 +10,24 @@ class ShowFileList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return Expanded(
-    // child: GetBuilder<FileManagement>(
-    //   builder: (_) {
-    //     return ListView.builder(
-    //       itemCount: fileManagement.hashMap.length,
-    //       itemBuilder: (context, index) {
-    //         if (fileManagement.hashMap.values.elementAt(index).length > 1) {
-    //           return ShowFileDetails(
-    //             fileList: fileManagement.hashMap.values.elementAt(index),
-    //           );
-    //         }
-    //       },
-    //     );
-    //   },
-    // ),
-    // );
-    return Container();
+    return Expanded(
+    child: GetBuilder<FileManagement>(
+      builder: (_) {
+        return ListView.builder(
+          itemCount: fileManagement.duplicateFiles.length,
+          itemBuilder: (context, index) {
+            if (fileManagement.duplicateFiles.values.elementAt(index).length > 1) {
+              return ShowFileDetails(
+                fileList: fileManagement.duplicateFiles.values.elementAt(index),
+              );
+            }
+            return null;
+          },
+        );
+      },
+    ),
+    );
+    // return Container();
   }
 }
 
